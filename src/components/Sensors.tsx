@@ -24,7 +24,7 @@ const SensorsComponent = ({
   }, []);
 
   return (
-    <div className="col-span-1 row-span-1 bg-white rounded-lg shadow-md p-4 flex flex-col">
+    <div className=" bg-white rounded-lg shadow-md p-4 flex flex-col h-full overflow-y-scroll">
       <h2 className="text-lg font-bold mb-4 text-gray-700">Sensor Dashboard</h2>
 
       <div className="flex justify-between items-center mb-4">

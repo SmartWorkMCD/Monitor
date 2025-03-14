@@ -3,7 +3,7 @@ const TasksComponent = ({ tasks }: {
     tasks: { id: number; title: string; status: string; deadline: string }[];
 }) => {
 	return (
-		<div className="col-span-1 row-span-1 bg-white rounded-lg shadow-md p-4 flex flex-col">
+		<div className=" bg-white rounded-lg shadow-md p-4 flex flex-col h-full">
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-lg font-bold text-gray-700">Task List</h2>
 				<div className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">

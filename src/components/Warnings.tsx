@@ -4,7 +4,7 @@ const WarningsComponent = ({warnings}: {
     warnings: { id: number, severity: string, message: string, timestamp: string }[]
 }) => {
     return (
-        <div className="col-span-1 row-span-1 bg-white rounded-lg shadow-md p-4 flex flex-col">
+        <div className=" bg-white rounded-lg shadow-md p-4 flex flex-col h-full">
           <h2 className="text-lg font-bold mb-4 text-gray-700">Warning Journal</h2>
 
           <div className="overflow-y-auto">
