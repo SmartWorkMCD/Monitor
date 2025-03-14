@@ -1,0 +1,7 @@
+{
+    "temperature": 32.4,
+    "humidity": 45,
+    "pressure": 760,
+    "powerUsage": 4.2,
+    "status": "Operational"
+}

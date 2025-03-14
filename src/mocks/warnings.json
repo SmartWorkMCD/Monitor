@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "severity": "high",
+        "message": "Temperature anomaly in chocolate tempering unit",
+        "timestamp": "10:42 AM"
+    },
+    {
+        "id": 2,
+        "severity": "medium",
+        "message": "Sugar syrup viscosity outside acceptable range",
+        "timestamp": "09:15 AM"
+    },
+    {
+        "id": 3,
+        "severity": "low",
+        "message": "Scheduled maintenance due for wrapping machine",
+        "timestamp": "Yesterday"
+    },
+    {
+        "id": 4,
+        "severity": "high",
+        "message": "Foreign object detected on gummy line",
+        "timestamp": "Yesterday"
+    }
+]
