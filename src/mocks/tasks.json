@@ -3,42 +3,42 @@
         "id": 1,
         "title": "Check sugar level in mixing tanks",
         "status": "pending",
-        "deadline": "Today"
+        "deadline": 1747501529000
     },
     {
         "id": 2,
         "title": "Clean chocolate coating machine",
         "status": "completed",
-        "deadline": "Today"
+        "deadline": 1747401529000
     },
     {
         "id": 3,
         "title": "Inspect candy cooling conveyor",
         "status": "in-progress",
-        "deadline": "Tomorrow"
+        "deadline": 1747301529000
     },
     {
         "id": 4,
         "title": "Replace mold sets for gummy bears",
         "status": "pending",
-        "deadline": "Mar 16"
+        "deadline": 1747201529000
     },
     {
         "id": 5,
         "title": "Calibrate flavor dispensers",
         "status": "pending",
-        "deadline": "Mar 17"
+        "deadline": 1747201529000
     },
     {
         "id": 6,
         "title": "Sanitize packaging equipment",
         "status": "pending",
-        "deadline": "Mar 18"
+        "deadline": 1747101529000
     },
     {
         "id": 7,
         "title": "Restock wrapping material inventory",
         "status": "completed",
-        "deadline": "Mar 13"
+        "deadline": 1747101529000
     }
 ]

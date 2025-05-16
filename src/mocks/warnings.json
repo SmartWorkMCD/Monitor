@@ -3,24 +3,24 @@
         "id": 1,
         "severity": "high",
         "message": "Temperature anomaly in chocolate tempering unit",
-        "timestamp": "10:42 AM"
+        "timestamp": 1747401716000
     },
     {
         "id": 2,
         "severity": "medium",
         "message": "Sugar syrup viscosity outside acceptable range",
-        "timestamp": "09:15 AM"
+        "timestamp": 1737401716000
     },
     {
         "id": 3,
         "severity": "low",
         "message": "Scheduled maintenance due for wrapping machine",
-        "timestamp": "Yesterday"
+        "timestamp": 1727401716000
     },
     {
         "id": 4,
         "severity": "high",
         "message": "Foreign object detected on gummy line",
-        "timestamp": "Yesterday"
+        "timestamp": 1717401716000
     }
 ]

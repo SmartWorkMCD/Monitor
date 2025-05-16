@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { ArrowUp, ArrowDown, Thermometer, Droplets, Zap } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import dayjs from "dayjs";
+
 const SensorsComponent = ({
   sensorData,
 }: {
   sensorData: {
     temperature: number;
+    temperatureChange: number;
     humidity: number;
+    humidityChange: number;
     pressure: number;
     powerUsage: number;
+    powerUsageChange: number;
     status: string;
+    maintenanceDate: number;
   };
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -51,7 +57,7 @@ const SensorsComponent = ({
           </div>
           <div className="flex items-center mt-1 text-xs text-green-600">
             <ArrowDown size={12} />
-            <span>1.2° from last hour</span>
+            <span>{sensorData.temperatureChange}° from last hour</span>
           </div>
         </div>
 
@@ -68,7 +74,7 @@ const SensorsComponent = ({
           </div>
           <div className="flex items-center mt-1 text-xs text-red-600">
             <ArrowUp size={12} />
-            <span>3% from last hour</span>
+            <span>{sensorData.humidityChange}% from last hour</span>
           </div>
         </div>
 
@@ -100,7 +106,7 @@ const SensorsComponent = ({
           </div>
           <div className="flex items-center mt-1 text-xs text-green-600">
             <ArrowDown size={12} />
-            <span>0.3kW from yesterday</span>
+            <span>{sensorData.powerUsageChange}kW from yesterday</span>
           </div>
         </div>
       </div>
@@ -109,7 +115,7 @@ const SensorsComponent = ({
         <div className="font-medium">System Notes:</div>
         <p>
           All systems functioning within normal parameters. Scheduled
-          maintenance in 3 days.
+          maintenance {dayjs().to(dayjs(sensorData.maintenanceDate))}
         </p>
       </div>
     </div>

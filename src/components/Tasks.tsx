@@ -1,14 +1,16 @@
 import { CheckCircle, Clock } from "lucide-react";
+import dayjs from "dayjs";
+
 const TasksComponent = ({ tasks }: {
-    tasks: { id: number; title: string; status: string; deadline: string }[];
+    tasks: { id: number; title: string; status: string; deadline: number }[];
 }) => {
 	return (
 		<div className=" bg-white rounded-lg shadow-md p-4 flex flex-col h-full">
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-lg font-bold text-gray-700">Task List</h2>
-				<div className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
+				{/* <div className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
 					+ Add Task
-				</div>
+				</div> */}
 			</div>
 
 			<div className="overflow-y-auto">
@@ -36,7 +38,7 @@ const TasksComponent = ({ tasks }: {
 										{task.title}
 									</div>
 									<div className="text-xs text-gray-500 mt-1 text-left">
-										Due: {task.deadline}
+										Due: {dayjs(task.deadline).calendar(null)}
 									</div>
 								</div>
 							</div>

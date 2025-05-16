@@ -1,7 +1,11 @@
 {
     "temperature": 32.4,
+    "temperatureChange": -1.2,
     "humidity": 45,
+    "humidityChange": 2.5,
     "pressure": 760,
     "powerUsage": 4.2,
-    "status": "Operational"
+    "powerUsageChange": 0.1,
+    "status": "Operational",
+    "maintenanceDate": 1757401797000
 }

@@ -1,7 +1,8 @@
 import { AlertTriangle } from 'lucide-react';
+import dayjs from "dayjs";
 
 const WarningsComponent = ({warnings}: {
-    warnings: { id: number, severity: string, message: string, timestamp: string }[]
+    warnings: { id: number, severity: string, message: string, timestamp: number }[]
 }) => {
     return (
         <div className=" bg-white rounded-lg shadow-md p-4 flex flex-col h-full">
@@ -28,7 +29,7 @@ const WarningsComponent = ({warnings}: {
                   />
                   <div>
                     <div className="font-medium text-gray-800">{warning.message}</div>
-                    <div className="text-xs text-gray-500 mt-1 text-left">{warning.timestamp}</div>
+                    <div className="text-xs text-gray-500 mt-1 text-left">{dayjs(warning.timestamp).calendar(null)}</div>
                   </div>
                 </div>
               </div>
