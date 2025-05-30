@@ -182,7 +182,7 @@ describe('Warnings', () => {
   })
 
   it('handles view all alerts button click', async () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const warnings = createMockWarnings(1)
     const { user } = render(<Warnings warnings={warnings} />)
 
