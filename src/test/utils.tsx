@@ -14,7 +14,7 @@ export const renderWithProviders = (
   ui: ReactElement,
   options: CustomRenderOptions = {}
 ) => {
-  const { initialProps, ...renderOptions } = options
+  const { initialProps, ...renderOptions } = options // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     // Add any providers here (Router, Context, etc.)
@@ -115,9 +115,10 @@ export const expectButtonToBeAccessible = (button: HTMLElement) => {
 
 // Mock data generators for performance testing
 // Fixed: Added 'extends unknown' constraint to prevent JSX interpretation
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export const generateLargeDataset = <T extends unknown>(
   factory: () => T,
-  size: number = 1000
+  size = 1000
 ): T[] => {
   return Array.from({ length: size }, factory)
 }
@@ -148,6 +149,7 @@ export const createMockEvent = <T extends Event>(
 }
 
 // Re-export everything from testing library with modern patterns
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react'
 // Fixed: Remove duplicate userEvent exports
 export { userEvent }

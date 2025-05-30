@@ -33,7 +33,7 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-const': 'error',
+      // '@typescript-eslint/prefer-const': 'error',
       '@typescript-eslint/no-non-null-assertion': 'warn',
       // Code quality rules
       'prefer-const': 'error',

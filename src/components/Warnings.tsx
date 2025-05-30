@@ -103,7 +103,7 @@ const Warnings = ({ warnings }: WarningsProps) => {
 					data-testid="view-all-alerts-button"
 					onClick={() => {
 						// TODO: Implement view all alerts functionality
-						console.log("View all alerts clicked");
+						console.warn("View all alerts clicked");
 					}}
 					type="button"
 				>
