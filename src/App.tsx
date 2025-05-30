@@ -1,18 +1,14 @@
-import './App.css'
-
-import Dashboard from './components/Dashboard'
-
+import Dashboard from "./components/Dashboard";
 import dayjs from "dayjs";
-import calendar from 'dayjs/plugin/calendar'
- import relativeTime from 'dayjs/plugin/relativeTime'
+import calendar from "dayjs/plugin/calendar";
+import relativeTime from "dayjs/plugin/relativeTime";
 
+// Configure dayjs plugins once at app initialization
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
 
 function App() {
-  return (
-    <Dashboard />
-  )
+	return <Dashboard />;
 }
 
-export default App
+export default App;
