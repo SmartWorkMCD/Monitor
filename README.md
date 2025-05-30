@@ -70,7 +70,7 @@ Monitor/
 ## Getting Started
 
 ### Prerequisites
-- **Node.js 18+**
+- **Node.js 22+**
 - **pnpm** (recommended) or npm/yarn
 
 ### Installation

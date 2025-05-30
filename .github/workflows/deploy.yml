@@ -50,6 +50,7 @@ jobs:
           file: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
   build_and_deploy:
     runs-on: ubuntu-latest
     needs: test
