@@ -69,8 +69,29 @@ export type RuleEvaluationEvent = {
     details: string;
 };
 
+export type UserActionEvent = {
+    timestamp: number;
+    type: "user_action";
+    action: string;
+    data: {
+        subtask_id: string;
+        message: string;
+    };
+};
+
+export type PerformanceMetricsEvent = {
+    timestamp: number;
+    type: "performance_metrics";
+    data: {
+        task_completion_time: number;
+        subtask_id: string;
+    };
+};
+
 export type ManagementEvent =
     | SystemStatusEvent
     | StateTransitionEvent
     | TaskUpdateEvent
-    | RuleEvaluationEvent;
+    | RuleEvaluationEvent
+	| UserActionEvent
+	| PerformanceMetricsEvent;

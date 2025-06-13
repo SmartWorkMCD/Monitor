@@ -9,11 +9,11 @@ dayjs.extend(calendar);
 dayjs.extend(relativeTime);
 
 function App() {
-	return (
-			<ManagementInterfaceProvider>
-					<Dashboard />
-			</ManagementInterfaceProvider>
-	);
+  return (
+    <ManagementInterfaceProvider>
+      <Dashboard />
+    </ManagementInterfaceProvider>
+  );
 }
 
 export default App;
