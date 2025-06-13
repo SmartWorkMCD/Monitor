@@ -6,6 +6,12 @@
 	"pressure": 760,
 	"powerUsage": 4.2,
 	"powerUsageChange": 0.1,
-	"status": "Operational",
-	"maintenanceDate": 1757401797000
+	"status": "active",
+	"systemMessage": "Production line operating normally",
+	"maintenanceDate": 1757401797000,
+	"lastStateTransition": {
+		"fromState": "idle",
+		"toState": "active",
+		"timestamp": 1747401717000
+	}
 }

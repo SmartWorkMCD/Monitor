@@ -1,26 +1,60 @@
 [
 	{
 		"id": 1,
+		"type": "rule_evaluation",
+		"ruleId": "TEMP_CHOCOLATE_TEMPERING",
 		"severity": "high",
 		"message": "Temperature anomaly in chocolate tempering unit",
+		"details": "Temperature exceeded 35°C threshold for tempering process",
+		"satisfied": false,
 		"timestamp": 1747401716000
 	},
 	{
 		"id": 2,
+		"type": "rule_evaluation",
+		"ruleId": "VISCOSITY_SUGAR_SYRUP",
 		"severity": "medium",
 		"message": "Sugar syrup viscosity outside acceptable range",
+		"details": "Viscosity measurement: 850 cP (acceptable range: 750-800 cP)",
+		"satisfied": false,
 		"timestamp": 1737401716000
 	},
 	{
 		"id": 3,
+		"type": "system_status",
 		"severity": "low",
 		"message": "Scheduled maintenance due for wrapping machine",
+		"systemStatus": "cleaning",
+		"details": "Preventive maintenance scheduled for next production cycle",
 		"timestamp": 1727401716000
 	},
 	{
 		"id": 4,
+		"type": "rule_evaluation",
+		"ruleId": "FOREIGN_OBJECT_DETECTION",
 		"severity": "high",
-		"message": "Foreign object detected on gummy line",
+		"message": "Foreign object detected on gummy production line",
+		"details": "Object detection system flagged potential contamination at station 3",
+		"satisfied": false,
 		"timestamp": 1717401716000
+	},
+	{
+		"id": 5,
+		"type": "system_status",
+		"severity": "medium",
+		"message": "Production line switching to idle mode",
+		"systemStatus": "idle",
+		"details": "Automatic transition due to low material inventory",
+		"timestamp": 1707401716000
+	},
+	{
+		"id": 6,
+		"type": "rule_evaluation",
+		"ruleId": "HAND_SAFETY_ZONE",
+		"severity": "medium",
+		"message": "Hand detected in safety zone during operation",
+		"details": "Hand tracking system detected operator hand near moving parts",
+		"satisfied": false,
+		"timestamp": 1697401716000
 	}
 ]

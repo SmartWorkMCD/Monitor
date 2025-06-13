@@ -1,3 +1,4 @@
+// src/components/Sensors.tsx
 import { useEffect, useState } from "react";
 import {
 	ArrowUp,
@@ -6,6 +7,8 @@ import {
 	Droplets,
 	Zap,
 	Gauge,
+	Activity,
+	Clock,
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import dayjs from "dayjs";
@@ -41,6 +44,8 @@ const getChangeIndicator = (change: number) => {
 
 const Sensors = ({ sensorData }: SensorsProps) => {
 	const [currentTime, setCurrentTime] = useState(new Date());
+	const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+	const [updateCount, setUpdateCount] = useState(0);
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -50,13 +55,40 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 		return () => clearInterval(timer);
 	}, []);
 
+	// Track when sensor data changes
+	useEffect(() => {
+		setLastUpdate(new Date());
+		setUpdateCount(prev => prev + 1);
+	}, [sensorData]);
+
 	const temperatureChange = getChangeIndicator(sensorData.temperatureChange);
 	const humidityChange = getChangeIndicator(sensorData.humidityChange);
 	const powerChange = getChangeIndicator(sensorData.powerUsageChange);
 
+	const getStatusColor = (status: string) => {
+		switch (status.toLowerCase()) {
+			case 'operational':
+				return 'text-green-600';
+			case 'warning':
+				return 'text-yellow-600';
+			case 'critical':
+				return 'text-red-600';
+			default:
+				return 'text-gray-600';
+		}
+	};
+
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-full overflow-y-auto">
-			<h2 className="text-lg font-bold mb-4 text-gray-700">Sensor Dashboard</h2>
+			<div className="flex justify-between items-center mb-4">
+				<h2 className="text-lg font-bold text-gray-700">Sensor Dashboard</h2>
+				<div className="flex items-center gap-2">
+					<Activity size={16} className="text-blue-500" />
+					<span className="text-xs text-gray-500">
+						{updateCount} updates
+					</span>
+				</div>
+			</div>
 
 			{/* Header with current time and status */}
 			<div className="flex justify-between items-center mb-4">
@@ -67,6 +99,16 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 				</div>
 				<StatusBadge status={sensorData.status} />
 			</div>
+
+			{/* Last update indicator */}
+			{lastUpdate && (
+				<div className="flex items-center gap-2 mb-4 p-2 bg-gray-50 rounded">
+					<Clock size={14} className="text-gray-400" />
+					<span className="text-xs text-gray-500">
+						Last update: {dayjs(lastUpdate).format('HH:mm:ss')}
+					</span>
+				</div>
+			)}
 
 			{/* Sensor metrics grid */}
 			<div className="grid grid-cols-2 gap-4 mt-2">
@@ -80,7 +122,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 					</div>
 					<div className="flex items-baseline">
 						<span className="text-2xl font-bold text-blue-700" data-testid="temperature-value">
-							{sensorData.temperature}
+							{sensorData.temperature.toFixed(1)}
 						</span>
 						<span className="ml-1 text-gray-500">°C</span>
 					</div>
@@ -90,7 +132,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 					>
 						{temperatureChange.icon}
 						<span>
-							{Math.abs(sensorData.temperatureChange)}° from last hour
+							{Math.abs(sensorData.temperatureChange).toFixed(1)}° from last hour
 						</span>
 					</div>
 				</div>
@@ -112,7 +154,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 						data-testid="humidity-change"
 					>
 						{humidityChange.icon}
-						<span>{Math.abs(sensorData.humidityChange)}% from last hour</span>
+						<span>{Math.abs(sensorData.humidityChange).toFixed(1)}% from last hour</span>
 					</div>
 				</div>
 
@@ -141,7 +183,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 					</div>
 					<div className="flex items-baseline">
 						<span className="text-2xl font-bold text-amber-700" data-testid="power-value">
-							{sensorData.powerUsage}
+							{sensorData.powerUsage.toFixed(1)}
 						</span>
 						<span className="ml-1 text-gray-500">kW</span>
 					</div>
@@ -151,9 +193,28 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 					>
 						{powerChange.icon}
 						<span>
-							{Math.abs(sensorData.powerUsageChange)}kW from yesterday
+							{Math.abs(sensorData.powerUsageChange).toFixed(1)}kW from yesterday
 						</span>
 					</div>
+				</div>
+			</div>
+
+			{/* System status summary */}
+			<div className="mt-4 p-3 bg-gray-50 rounded-lg">
+				<div className="flex items-center gap-2 mb-2">
+					<Activity size={16} className={getStatusColor(sensorData.status)} />
+					<span className="text-sm font-medium text-gray-700">System Status</span>
+				</div>
+				<div className="text-sm text-gray-600">
+					{sensorData.status === 'Operational' && (
+						<span className="text-green-600">All systems functioning normally</span>
+					)}
+					{sensorData.status === 'Warning' && (
+						<span className="text-yellow-600">Some systems require attention</span>
+					)}
+					{sensorData.status === 'Critical' && (
+						<span className="text-red-600">Critical systems offline</span>
+					)}
 				</div>
 			</div>
 
@@ -161,8 +222,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 			<div className="mt-4 text-sm text-gray-500" data-testid="system-notes">
 				<div className="font-medium">System Notes:</div>
 				<p data-testid="maintenance-info">
-					All systems functioning within normal parameters. Scheduled
-					maintenance <span data-testid="maintenance-date">{dayjs().to(dayjs(sensorData.maintenanceDate))}</span>
+					Scheduled maintenance <span data-testid="maintenance-date">{dayjs().to(dayjs(sensorData.maintenanceDate))}</span>
 				</p>
 			</div>
 		</div>

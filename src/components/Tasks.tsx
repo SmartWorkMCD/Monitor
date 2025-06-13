@@ -39,12 +39,36 @@ const calculateTaskStats = (tasks: Task[]) => {
 	const total = tasks.length;
 	const completed = tasks.filter((task) => task.status === "completed").length;
 	const inProgress = tasks.filter(
-		(task) => task.status === "in-progress",
+		(task) => task.status === "in_progress" || task.status === "started",
 	).length;
-	const pending = tasks.filter((task) => task.status === "pending").length;
+	const waitingConfirmation = tasks.filter(
+		(task) => task.status === "waiting_confirmation",
+	).length;
+	const failed = tasks.filter((task) => task.status === "failed").length;
 
-	return { total, completed, inProgress, pending };
+	const totalProgress = tasks.reduce((sum, task) => sum + (task.progress || 0), 0);
+	const averageProgress = total > 0 ? totalProgress / total : 0;
+
+	return {
+		total,
+		completed,
+		inProgress,
+		waitingConfirmation,
+		failed,
+		averageProgress: Math.round(averageProgress * 10) / 10
+	};
 };
+
+// Helper function to get progress bar color
+const getProgressBarColor = (progress: number, status: TaskStatus) => {
+	if (status === "completed") return "bg-green-500";
+	if (status === "failed") return "bg-red-500";
+	if (status === "waiting_confirmation") return "bg-orange-500";
+	if (progress >= 80) return "bg-blue-500";
+	if (progress >= 50) return "bg-blue-400";
+	return "bg-blue-300";
+};
+
 
 const Tasks = ({ tasks }: TasksProps) => {
 	const stats = calculateTaskStats(tasks);
@@ -57,8 +81,11 @@ const Tasks = ({ tasks }: TasksProps) => {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-4" data-testid="tasks-header">
 				<h2 className="text-lg font-bold text-gray-700" data-testid="tasks-title">
-					Task List
+					Production Tasks
 				</h2>
+				<div className="text-sm text-gray-500">
+					{stats.averageProgress}% avg progress
+				</div>
 			</div>
 
 			{/* Task list with scroll */}
@@ -76,32 +103,72 @@ const Tasks = ({ tasks }: TasksProps) => {
 				) : (
 					tasks.map((task) => {
 						const statusConfig = getTaskStatusConfig(task.status);
+						const isOverdue = task.deadline < Date.now() && task.status !== "completed";
+
+						if (!statusConfig) {
+							return <div
+								key={task.id}
+								className="text-red-500 text-sm"
+								data-testid="task-error"
+								>
+								Invalid task status: {task.status}
+							</div>;
+						}
+
 
 						return (
 							<div
 								key={task.id}
-								className="mb-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+								className={`mb-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors ${
+									isOverdue ? "border-red-200 bg-red-50" : ""
+								}`}
 								data-testid="task-item"
 								data-task-id={task.id}
 								data-task-status={task.status}
 							>
 								<div className="flex justify-between">
-									<div className="flex items-start" data-testid="task-content">
+									<div className="flex items-start flex-1" data-testid="task-content">
 										<div data-testid="task-icon">
 											{statusConfig.icon}
 										</div>
-										<div>
+										<div className="flex-1">
 											<div
 												className={`font-medium ${statusConfig.textClass}`}
 												data-testid="task-title"
 											>
 												{task.title}
 											</div>
+											<div className="text-xs text-gray-500 mt-1">
+												<span data-testid="task-ids">
+													{task.taskId} → {task.subtaskId}
+												</span>
+											</div>
 											<div
 												className="text-xs text-gray-500 mt-1 text-left"
 												data-testid="task-deadline"
 											>
 												Due: {dayjs(task.deadline).calendar()}
+												{isOverdue && (
+													<span className="text-red-600 font-medium ml-1">
+														(Overdue)
+													</span>
+												)}
+											</div>
+											{/* Progress Bar */}
+											<div className="mt-2" data-testid="task-progress-container">
+												<div className="flex justify-between items-center mb-1">
+													<span className="text-xs text-gray-600">Progress</span>
+													<span className="text-xs font-medium text-gray-800" data-testid="task-progress-text">
+														{task.progress}%
+													</span>
+												</div>
+												<div className="w-full bg-gray-200 rounded-full h-2">
+													<div
+														className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor(task.progress, task.status)}`}
+														style={{ width: `${Math.min(task.progress, 100)}%` }}
+														data-testid="task-progress-bar"
+													/>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -139,7 +206,6 @@ const Tasks = ({ tasks }: TasksProps) => {
 						data-testid="tasks-status-breakdown"
 					>
 						{stats.completed} completed • {stats.inProgress} in progress •{" "}
-						{stats.pending} pending
 					</span>
 				</div>
 			</div>

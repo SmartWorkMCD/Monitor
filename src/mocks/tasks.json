@@ -1,44 +1,62 @@
 [
 	{
-		"id": 1,
+		"id": "task_001",
+		"taskId": "candy_production_batch_1",
+		"subtaskId": "check_sugar_mixing_tanks",
 		"title": "Check sugar level in mixing tanks",
-		"status": "pending",
-		"deadline": 1747501529000
+		"status": "in_progress",
+		"progress": 75.5,
+		"deadline": 1747501529000,
+		"lastUpdate": 1747401529000
 	},
 	{
-		"id": 2,
+		"id": "task_002",
+		"taskId": "chocolate_coating_maintenance",
+		"subtaskId": "clean_coating_machine",
 		"title": "Clean chocolate coating machine",
 		"status": "completed",
-		"deadline": 1747401529000
+		"progress": 100.0,
+		"deadline": 1747401529000,
+		"lastUpdate": 1747381529000
 	},
 	{
-		"id": 3,
+		"id": "task_003",
+		"taskId": "conveyor_inspection_routine",
+		"subtaskId": "inspect_cooling_conveyor",
 		"title": "Inspect candy cooling conveyor",
-		"status": "in-progress",
-		"deadline": 1747301529000
+		"status": "waiting_confirmation",
+		"progress": 90.0,
+		"deadline": 1747301529000,
+		"lastUpdate": 1747291529000
 	},
 	{
-		"id": 4,
+		"id": "task_004",
+		"taskId": "mold_replacement_schedule",
+		"subtaskId": "replace_gummy_molds",
 		"title": "Replace mold sets for gummy bears",
-		"status": "pending",
-		"deadline": 1747201529000
+		"status": "started",
+		"progress": 25.0,
+		"deadline": 1747201529000,
+		"lastUpdate": 1747191529000
 	},
 	{
-		"id": 5,
+		"id": "task_005",
+		"taskId": "flavor_calibration_daily",
+		"subtaskId": "calibrate_dispensers",
 		"title": "Calibrate flavor dispensers",
-		"status": "pending",
-		"deadline": 1747201529000
+		"status": "failed",
+		"progress": 45.0,
+		"deadline": 1747201529000,
+		"lastUpdate": 1747181529000
 	},
 	{
-		"id": 6,
+		"id": "task_006",
+		"taskId": "packaging_sanitation",
+		"subtaskId": "sanitize_equipment",
 		"title": "Sanitize packaging equipment",
-		"status": "pending",
-		"deadline": 1747101529000
-	},
-	{
-		"id": 7,
-		"title": "Restock wrapping material inventory",
-		"status": "completed",
-		"deadline": 1747101529000
+		"status": "started",
+		"progress": 15.0,
+		"deadline": 1747101529000,
+		"lastUpdate": 1747091529000
 	}
 ]

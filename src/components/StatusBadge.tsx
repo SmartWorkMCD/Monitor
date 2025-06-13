@@ -6,6 +6,7 @@ interface StatusBadgeProps {
 }
 
 const StatusBadge = ({ status, size = "md" }: StatusBadgeProps) => {
+
 	// Configuration for different status types
 	const statusConfig = {
 		Operational: {
@@ -33,6 +34,12 @@ const StatusBadge = ({ status, size = "md" }: StatusBadgeProps) => {
 
 	const config = statusConfig[status];
 	const sizeClass = sizeConfig[size];
+
+	if (!config) {
+		return (
+			<span>No badge</span>
+		);
+	}
 
 	return (
 		<span
