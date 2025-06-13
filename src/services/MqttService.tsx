@@ -64,7 +64,7 @@ export class MqttService {
         const clientOptions: mqtt.IClientOptions = {
           clean: true,
           connectTimeout: 4000,
-          clientId: 'monitor_dashboard_' + Math.random().toString(16).substr(2, 8),
+          clientId: `monitor_dashboard_${  Math.random().toString(16).substr(2, 8)}`,
           keepalive: 60,
           reconnectPeriod: 5000,
         };
