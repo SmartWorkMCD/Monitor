@@ -37,3 +37,40 @@ export interface SensorMetric {
 	changeUnit?: string;
 	changeType?: "increase" | "decrease" | "stable";
 }
+
+export type SystemStatusEvent = {
+    timestamp: number;
+    type: "system_status";
+    status: string;
+    message: string;
+};
+
+export type StateTransitionEvent = {
+    timestamp: number;
+    type: "state_transition";
+    from_state: string;
+    to_state: string;
+};
+
+export type TaskUpdateEvent = {
+    timestamp: number;
+    type: "task_update";
+    task_id: string;
+    subtask_id: string;
+    status: string;
+    progress: number;
+};
+
+export type RuleEvaluationEvent = {
+    timestamp: number;
+    type: "rule_evaluation";
+    rule_id: string;
+    satisfied: boolean;
+    details: string;
+};
+
+export type ManagementEvent =
+    | SystemStatusEvent
+    | StateTransitionEvent
+    | TaskUpdateEvent
+    | RuleEvaluationEvent;
