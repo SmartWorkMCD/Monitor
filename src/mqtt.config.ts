@@ -1,3 +1,4 @@
+
 import type { MqttConfig } from "./services/MqttService";
 
 export const mqttConfig: MqttConfig = {
@@ -5,8 +6,11 @@ export const mqttConfig: MqttConfig = {
   username: 'admin',
   password: 'admin',
   topics: {
+    // Main topic for receiving updates from Workstation Brain
     management: 'management/interface',
+    // Topic for projector control messages (additional context)
     projector: 'projector/control',
+    // Topic for telemetry data (task completion timing)
     telemetry: 'v1/devices/me/telemetry'
   }
 };

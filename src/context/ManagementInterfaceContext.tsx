@@ -25,7 +25,7 @@ const defaultSensorData: SensorData = {
   powerUsage: 4.0,
   powerUsageChange: 0,
   status: 'Operational',
-  maintenanceDate: Date.now() + 86400000 * 7
+  maintenanceDate: Date.now() + 86400000 * 7 // 7 days from now
 };
 
 const ManagementInterfaceContext = createContext<ManagementContextType | null>(null);
@@ -49,7 +49,11 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
   });
 
   const updateSensorData = (sensorData: SensorData) => {
-    setDataState(prev => ({ ...prev, sensorData }));
+    setDataState(prev => ({
+      ...prev,
+      sensorData,
+      systemStatus: sensorData.status
+    }));
   };
 
   const updateTasks = (tasks: Task[]) => {
@@ -64,27 +68,46 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
     setDataState(prev => ({ ...prev, systemStatus }));
   };
 
+  const updateConnectionStatus = (isConnected: boolean) => {
+    setDataState(prev => ({ ...prev, isConnected }));
+  };
+
   const connectToMqtt = async () => {
     try {
+      console.log('Connecting to MQTT broker for Workstation Brain data...');
+
       await mqttService.connect({
         onSensorData: updateSensorData,
         onTasks: updateTasks,
         onWarnings: updateWarnings,
-        onSystemStatus: updateSystemStatus
+        onSystemStatus: updateSystemStatus,
+        onConnectionChange: updateConnectionStatus
       });
 
-      setDataState(prev => ({ ...prev, isConnected: true }));
+      console.log('Successfully connected to Workstation Brain MQTT broker');
 
-      // Start sensor simulation if no real sensor data is available
-      mqttService.simulateSensorUpdates();
+      // Only start simulation if no real data is received within 30 seconds
+      setTimeout(() => {
+        if (dataState.tasks.length === 0) {
+          console.log('No real task data received, starting sensor simulation...');
+          mqttService.simulateSensorUpdates();
+        }
+      }, 30000);
 
     } catch (error) {
       console.error('Failed to connect to MQTT:', error);
       setDataState(prev => ({ ...prev, isConnected: false }));
+
+      // Start simulation as fallback if connection fails
+      setTimeout(() => {
+        console.log('Starting fallback sensor simulation...');
+        mqttService.simulateSensorUpdates();
+      }, 5000);
     }
   };
 
   const reconnect = async () => {
+    console.log('Attempting to reconnect to Workstation Brain...');
     mqttService.disconnect();
     await connectToMqtt();
   };

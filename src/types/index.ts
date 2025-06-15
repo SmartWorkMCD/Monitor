@@ -38,6 +38,7 @@ export interface SensorMetric {
 	changeType?: "increase" | "decrease" | "stable";
 }
 
+// Event types matching Workstation Brain's management interface
 export type SystemStatusEvent = {
     timestamp: number;
     type: "system_status";
@@ -73,19 +74,13 @@ export type UserActionEvent = {
     timestamp: number;
     type: "user_action";
     action: string;
-    data: {
-        subtask_id: string;
-        message: string;
-    };
+    details: Record<string, any>;
 };
 
 export type PerformanceMetricsEvent = {
     timestamp: number;
     type: "performance_metrics";
-    data: {
-        task_completion_time: number;
-        subtask_id: string;
-    };
+    metrics: Record<string, any>;
 };
 
 export type ManagementEvent =
@@ -95,3 +90,39 @@ export type ManagementEvent =
     | RuleEvaluationEvent
 	| UserActionEvent
 	| PerformanceMetricsEvent;
+
+// Workstation states from the Brain
+export type WorkstationState =
+    | "idle"
+    | "waiting_for_task"
+    | "cleaning"
+    | "executing_task"
+    | "waiting_confirmation"
+    | "task_completed";
+
+// Task mappings for different product types
+export interface ProductConfig {
+    [color: string]: number;
+}
+
+export interface TaskDefinition {
+    task_name: string;
+    task_description: string;
+    rules: string[];
+}
+
+export interface WorkstationConfig {
+    mqtt: {
+        enabled: boolean;
+        broker_ip: string;
+        broker_port: number;
+        username: string;
+        password: string;
+    };
+    grid: {
+        rows: number;
+        cols: number;
+        image_width: number;
+        image_height: number;
+    };
+}

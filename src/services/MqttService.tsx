@@ -1,6 +1,5 @@
 import mqtt, { type MqttClient } from 'mqtt';
 import type {
-  ManagementEvent,
   SensorData,
   Task,
   Warning,
@@ -27,6 +26,59 @@ export type DataUpdateCallback = {
   onSystemStatus?: (status: SystemStatus) => void;
   onConnectionChange?: (connected: boolean) => void;
 };
+
+// Message types from Workstation Brain
+export type SystemStatusEvent = {
+  timestamp: number;
+  type: "system_status";
+  status: string;
+  message: string;
+};
+
+export type StateTransitionEvent = {
+  timestamp: number;
+  type: "state_transition";
+  from_state: string;
+  to_state: string;
+};
+
+export type TaskUpdateEvent = {
+  timestamp: number;
+  type: "task_update";
+  task_id: string;
+  subtask_id: string;
+  status: string;
+  progress: number;
+};
+
+export type RuleEvaluationEvent = {
+  timestamp: number;
+  type: "rule_evaluation";
+  rule_id: string;
+  satisfied: boolean;
+  details: string;
+};
+
+export type UserActionEvent = {
+  timestamp: number;
+  type: "user_action";
+  action: string;
+  details: Record<string, any>;
+};
+
+export type PerformanceMetricsEvent = {
+  timestamp: number;
+  type: "performance_metrics";
+  metrics: Record<string, any>;
+};
+
+export type ManagementEvent =
+  | SystemStatusEvent
+  | StateTransitionEvent
+  | TaskUpdateEvent
+  | RuleEvaluationEvent
+  | UserActionEvent
+  | PerformanceMetricsEvent;
 
 export class MqttService {
   private client: MqttClient | null = null;
@@ -64,7 +116,7 @@ export class MqttService {
         const clientOptions: mqtt.IClientOptions = {
           clean: true,
           connectTimeout: 4000,
-          clientId: `monitor_dashboard_${  Math.random().toString(16).substr(2, 8)}`,
+          clientId: `monitor_dashboard_${Math.random().toString(16).substr(2, 8)}`,
           keepalive: 60,
           reconnectPeriod: 5000,
         };
@@ -174,78 +226,102 @@ export class MqttService {
     }
   }
 
-  private handleManagementMessage(message: any): void {
-    const event = message as ManagementEvent;
-
-    switch (event.type) {
+  private handleManagementMessage(message: ManagementEvent): void {
+    switch (message.type) {
       case 'system_status':
-        this.updateSystemStatus(event.status as SystemStatus, event.message);
+        this.updateSystemStatus(message);
         break;
 
       case 'task_update':
-        this.updateTask(event);
+        this.updateTask(message);
         break;
 
       case 'rule_evaluation':
-        if (!event.satisfied) {
-          this.addWarning(event);
-        }
+        this.handleRuleEvaluation(message);
         break;
 
       case 'state_transition':
-        this.updateSystemState(event);
+        this.updateSystemState(message);
         break;
 
       case 'user_action':
-        console.log('User action received:', event);
+        console.log('User action received:', message);
         break;
 
       case 'performance_metrics':
-        console.log('Performance metrics received:', event);
+        this.updatePerformanceMetrics(message);
         break;
     }
   }
 
   private handleProjectorMessage(message: any): void {
-    // Handle projector control messages for task metadata
-    if (message.task_id && message.progress !== undefined) {
-      this.updateTaskProgress(message.task_id, message.progress);
+    // Handle projector messages for additional context
+    if (message.task && message.subtask && message.progress !== undefined) {
+      // Update task progress from projector
+      console.log(`Projector task update: ${message.task} - ${message.subtask} (${message.progress}%)`);
     }
   }
 
   private handleTelemetryMessage(message: any): void {
-    // Handle telemetry data for task completion timing
+    // Handle telemetry data for sensor metrics
     if (message.subtask_id && message.duration) {
-      this.updateTaskTiming(message.subtask_id, message.duration);
+      console.log(`Task completion timing: ${message.subtask_id} - ${message.duration}s`);
     }
   }
 
-  private updateSystemStatus(status: SystemStatus, message: string): void {
-    this.currentSensorData.status = status;
+  private updateSystemStatus(event: SystemStatusEvent): void {
+    // Map workstation states to system status
+    const statusMapping: Record<string, SystemStatus> = {
+      'idle': 'Operational',
+      'waiting': 'Operational',
+      'cleaning': 'Operational',
+      'executing': 'Operational',
+      'waiting_confirmation': 'Warning',
+      'completing': 'Operational',
+      'task_completed': 'Operational',
+      'error': 'Critical'
+    };
 
-    // Create a warning for non-operational status
-    if (status !== 'Operational' && message) {
-      // const severity: WarningSeverity = status === 'Critical' ? 'high' : 'medium';
+    const systemStatus = statusMapping[event.status] || 'Operational';
+
+    // Update sensor data with system status
+    this.currentSensorData = {
+      ...this.currentSensorData,
+      status: systemStatus
+    };
+
+    // Add warning for non-operational states
+    if (event.status === 'waiting_confirmation' || event.status === 'error') {
+      const severity: WarningSeverity = event.status === 'error' ? 'high' : 'medium';
       this.addWarning({
-        type: 'rule_evaluation',
-        timestamp: Date.now() / 1000,
-        rule_id: 'system_status',
-        satisfied: false,
-        details: message
+        severity,
+        message: event.message || `System status: ${event.status}`,
+        timestamp: event.timestamp * 1000 // Convert to milliseconds
       });
     }
 
     this.callbacks.onSensorData?.(this.currentSensorData);
-    this.callbacks.onSystemStatus?.(status);
+    this.callbacks.onSystemStatus?.(systemStatus);
   }
 
-  private updateTask(event: any): void {
+  private updateTask(event: TaskUpdateEvent): void {
     const taskId = event.subtask_id || event.task_id;
     const status: TaskStatus = this.mapTaskStatus(event.status);
 
+    // Generate human-readable task titles
+    const taskTitles: Record<string, string> = {
+      'T1A': 'Wrap Red Candies',
+      'T1B': 'Wrap Green Candies',
+      'T1C': 'Wrap Blue Candies',
+      'T2A': 'Assemble Candy Boxes',
+      'T3A': 'Insert Cardboard',
+      'T3B': 'Apply Adhesive',
+      'T3C': 'Decorative Finishing'
+    };
+
     const task: Task = {
       id: parseInt(taskId.replace(/\D/g, '')) || Date.now(),
-      title: this.generateTaskTitle(taskId),
+      title: taskTitles[taskId] || `Task ${taskId}`,
       status,
       deadline: Date.now() + 86400000 // 24 hours from now
     };
@@ -254,36 +330,55 @@ export class MqttService {
     this.callbacks.onTasks?.(Array.from(this.currentTasks.values()));
   }
 
-  private updateTaskProgress(taskId: string, progress: number): void {
-    const task = this.currentTasks.get(taskId);
-    if (task) {
-      // Update task status based on progress
-      if (progress >= 100) {
-        task.status = 'completed';
-      } else if (progress > 0) {
-        task.status = 'in-progress';
-      }
+  private handleRuleEvaluation(event: RuleEvaluationEvent): void {
+    if (!event.satisfied) {
+      const severity: WarningSeverity = this.mapSeverity(event.details || event.rule_id);
 
-      this.currentTasks.set(taskId, task);
-      this.callbacks.onTasks?.(Array.from(this.currentTasks.values()));
+      this.addWarning({
+        severity,
+        message: event.details || `Rule ${event.rule_id} evaluation failed`,
+        timestamp: event.timestamp * 1000
+      });
     }
   }
 
-  private updateTaskTiming(subtaskId: string, duration: number): void {
-    console.log(`Task ${subtaskId} completed in ${duration} seconds`);
+  private updateSystemState(event: StateTransitionEvent): void {
+    console.log(`State transition: ${event.from_state} → ${event.to_state}`);
+
+    // Update sensor data based on state transitions
+    if (event.to_state === 'executing_task') {
+      this.currentSensorData.powerUsage += 0.5; // Simulate increased power usage
+      this.currentSensorData.powerUsageChange = 0.5;
+    } else if (event.to_state === 'cleaning') {
+      this.currentSensorData.powerUsage -= 0.3;
+      this.currentSensorData.powerUsageChange = -0.3;
+    }
+
+    this.callbacks.onSensorData?.(this.currentSensorData);
   }
 
-  private addWarning(event: any): void {
-    const severity: WarningSeverity = this.mapSeverity(event.details || event.rule_id);
+  private updatePerformanceMetrics(event: PerformanceMetricsEvent): void {
+    const metrics = event.metrics;
 
-    const warning: Warning = {
+    if (metrics.task_completion_time && metrics.subtask_id) {
+      console.log(`Performance: ${metrics.subtask_id} completed in ${metrics.task_completion_time}s`);
+
+      // Add performance info as low-priority warning
+      this.addWarning({
+        severity: 'low',
+        message: `Task ${metrics.subtask_id} completed in ${metrics.task_completion_time.toFixed(1)}s`,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  private addWarning(warning: Omit<Warning, 'id'>): void {
+    const newWarning: Warning = {
       id: Date.now(),
-      severity,
-      message: event.details || `Rule ${event.rule_id} evaluation failed`,
-      timestamp: (event.timestamp * 1000) || Date.now()
+      ...warning
     };
 
-    this.currentWarnings.unshift(warning);
+    this.currentWarnings.unshift(newWarning);
 
     // Keep only last 50 warnings
     if (this.currentWarnings.length > 50) {
@@ -291,10 +386,6 @@ export class MqttService {
     }
 
     this.callbacks.onWarnings?.(this.currentWarnings);
-  }
-
-  private updateSystemState(event: any): void {
-    console.log(`State transition: ${event.from_state} -> ${event.to_state}`);
   }
 
   private mapTaskStatus(status: string): TaskStatus {
@@ -314,26 +405,11 @@ export class MqttService {
 
     if (lowerDetails.includes('critical') || lowerDetails.includes('error') || lowerDetails.includes('failed')) {
       return 'high';
-    } else if (lowerDetails.includes('warning') || lowerDetails.includes('anomaly')) {
+    } else if (lowerDetails.includes('warning') || lowerDetails.includes('anomaly') || lowerDetails.includes('confirmation')) {
       return 'medium';
     }
 
     return 'low';
-  }
-
-  private generateTaskTitle(taskId: string): string {
-    const taskTitles: Record<string, string> = {
-      'T1A': 'Wrap Yellow Candies',
-      'T1B': 'Wrap Blue Candies',
-      'T1C': 'Wrap Green Candies',
-      'T1D': 'Wrap Red Candies',
-      'T2A': 'Assemble Candy Boxes',
-      'T3A': 'Insert Cardboard',
-      'T3B': 'Apply Adhesive',
-      'T3C': 'Decorative Finishing'
-    };
-
-    return taskTitles[taskId] || `Task ${taskId}`;
   }
 
   disconnect(): void {
@@ -354,7 +430,7 @@ export class MqttService {
     return this.isConnected && this.client?.connected === true;
   }
 
-  // Method to simulate sensor data updates (if not coming from MQTT)
+  // Simulate sensor updates when no real data is available
   simulateSensorUpdates(): void {
     const simulationInterval = setInterval(() => {
       if (!this.isConnected) {
@@ -363,16 +439,19 @@ export class MqttService {
       }
 
       // Small random changes to sensor data
-      this.currentSensorData.temperature += Math.round((Math.random() - 0.5) * 64)/128;
-      this.currentSensorData.humidity += Math.round((Math.random() - 0.5) * 256)/128;
-      this.currentSensorData.powerUsage += Math.round((Math.random() - 0.5) * 16)/128;
+      this.currentSensorData.temperature += (Math.random() - 0.5) * 2;
+      this.currentSensorData.humidity += (Math.random() - 0.5) * 3;
 
-      // Update temperature and power change indicators
-      this.currentSensorData.temperatureChange = Math.round((Math.random() - 0.5) * 256)/128;
-      this.currentSensorData.humidityChange = Math.round((Math.random() - 0.5) * 384)/128;
-      this.currentSensorData.powerUsageChange = Math.round((Math.random() - 0.5) * 32)/128;
+      // Keep values in reasonable ranges
+      this.currentSensorData.temperature = Math.max(20, Math.min(35, this.currentSensorData.temperature));
+      this.currentSensorData.humidity = Math.max(30, Math.min(70, this.currentSensorData.humidity));
+
+      // Update change indicators
+      this.currentSensorData.temperatureChange = (Math.random() - 0.5) * 2;
+      this.currentSensorData.humidityChange = (Math.random() - 0.5) * 3;
+      this.currentSensorData.powerUsageChange = (Math.random() - 0.5) * 0.5;
 
       this.callbacks.onSensorData?.(this.currentSensorData);
-    }, 5000);
+    }, 10000); // Update every 10 seconds
   }
 }
