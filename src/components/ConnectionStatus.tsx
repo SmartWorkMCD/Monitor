@@ -251,7 +251,7 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ isOpen, onClose }) 
                       {topic}
                     </div>
                     <div className="flex items-center space-x-1 mt-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-green-400 rounded-full" />
                       <span className="text-xs text-gray-500">Active</span>
                     </div>
                   </div>
@@ -355,6 +355,8 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ isConnected }) => {
       };
     }
 
+    const healthColor = connectionHealth === 'warning' ? 'yellow' : (connectionHealth === 'critical' ? 'red' : 'green');
+
     switch (systemStatus) {
       case 'Critical':
         return {
@@ -373,8 +375,6 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ isConnected }) => {
           borderColor: 'border-yellow-200'
         };
       default:
-        const healthColor = connectionHealth === 'warning' ? 'yellow' :
-                           connectionHealth === 'critical' ? 'red' : 'green';
         return {
           text: `Connected - ${tasks.length} tasks active`,
           icon: <Wifi size={16} />,
@@ -388,7 +388,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ isConnected }) => {
   const getDataFlowStatus = () => {
     const now = Date.now();
     const timeSinceLastData = connectionStatus.last_data_received > 0 ?
-      now - connectionStatus.last_data_received : Infinity;
+      now - connectionStatus.last_data_received : Number.POSITIVE_INFINITY;
 
     const dataIndicators = [
       {
@@ -405,7 +405,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ isConnected }) => {
         icon: <Hand size={12} />,
         lastData: handPosition?.timestamp,
         color: 'text-blue-600',
-        value: realTimeMetrics.hand_tracking_accuracy.toFixed(0) + '%'
+        value: `${realTimeMetrics.hand_tracking_accuracy.toFixed(0)}%`
       },
       {
         label: 'Tasks',
@@ -421,7 +421,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ isConnected }) => {
         icon: <Wifi size={12} />,
         lastData: connectionStatus.last_data_received,
         color: 'text-indigo-600',
-        value: realTimeMetrics.network_latency.toFixed(0) + 'ms'
+        value: `${realTimeMetrics.network_latency.toFixed(0)}ms`
       }
     ];
 

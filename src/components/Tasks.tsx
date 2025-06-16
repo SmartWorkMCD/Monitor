@@ -108,37 +108,7 @@ const formatDuration = (duration?: number): string => {
 const Tasks = ({ tasks }: TasksProps) => {
 	const stats = calculateTaskStats(tasks);
 
-	// Sort tasks by priority and status
-	const sortedTasks = [...tasks].sort((a, b) => {
-		// First sort by status (active tasks first)
-		const statusPriority = {
-			'in-progress': 0,
-			'started': 1,
-			'waiting_confirmation': 2,
-			'pending': 3,
-			'failed': 4,
-			'completed': 5
-		};
-
-		const aStatusPriority = statusPriority[a.status] ?? 6;
-		const bStatusPriority = statusPriority[b.status] ?? 6;
-
-		if (aStatusPriority !== bStatusPriority) {
-			return aStatusPriority - bStatusPriority;
-		}
-
-		// Then sort by task priority
-		const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2 };
-		const aPriority = getTaskPriority(a);
-		const bPriority = getTaskPriority(b);
-
-		if (aPriority !== bPriority) {
-			return priorityOrder[aPriority] - priorityOrder[bPriority];
-		}
-
-		// Finally sort by deadline
-		return a.deadline - b.deadline;
-	});
+	const displayTasks = tasks;
 
 	return (
 		<div
@@ -166,16 +136,15 @@ const Tasks = ({ tasks }: TasksProps) => {
 				data-testid="tasks-list"
 			>
 				{tasks.length === 0 ? (
-					<div
-						className="text-center text-gray-500 py-8"
-						data-testid="tasks-empty-state"
-					>
-						<RotateCcw size={48} className="mx-auto text-gray-300 mb-4" />
-						<p>No tasks assigned</p>
-						<p className="text-sm mt-2">Waiting for task assignments from Workstation Brain...</p>
-					</div>
-				) : (
-					sortedTasks.map((task) => {
+                                        <div
+                                                className="text-center text-gray-500 py-8"
+                                                data-testid="tasks-empty-state"
+                                        >
+                                                <RotateCcw size={48} className="mx-auto text-gray-300 mb-4" />
+                                                <p>No tasks available</p>
+                                        </div>
+                                ) : (
+                                        displayTasks.map((task) => {
 						const statusConfig = getTaskStatusConfig(task.status);
 						const priority = getTaskPriority(task);
 
@@ -234,12 +203,12 @@ const Tasks = ({ tasks }: TasksProps) => {
 											)}
 
 											<div className="flex items-center justify-between mt-1">
-												<div
-													className="text-xs text-gray-500 text-left"
-													data-testid="task-deadline"
-												>
-													Due: {dayjs(task.deadline).calendar()}
-												</div>
+					<div
+                                                                               className="text-xs text-gray-500 mt-1 text-left"
+                                                                               data-testid="task-deadline"
+                                                                               >
+                                                                               Due: {dayjs(task.deadline).calendar()}
+                                                                               </div>
 												{task.duration && (
 													<div className="text-xs text-green-600 font-medium">
 														⏱️ {formatDuration(task.duration)}

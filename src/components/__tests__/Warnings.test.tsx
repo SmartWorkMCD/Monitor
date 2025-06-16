@@ -9,6 +9,8 @@ import type { Warning } from '../../types'
 vi.mock('dayjs', () => {
   const mockDayjs: any = vi.fn(() => ({
     calendar: vi.fn(() => 'Yesterday at 3:30 PM'),
+    format: vi.fn(() => 'May 1, 2024 10:00 AM'),
+    fromNow: vi.fn(() => 'a few seconds ago')
   }))
 
   mockDayjs.extend = vi.fn()
