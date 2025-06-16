@@ -56,7 +56,8 @@ export type ManagementEvent =
 	| TaskUpdateEvent
 	| RuleEvaluationEvent
 	| UserActionEvent
-	| PerformanceMetricsEvent;
+	| PerformanceMetricsEvent
+	| HandPositionEvent;
 
 export type SystemStatusEvent = {
 	timestamp: number;
@@ -102,6 +103,15 @@ export type PerformanceMetricsEvent = {
 	timestamp: number;
 	type: "performance_metrics";
 	metrics: Record<string, any>;
+};
+
+export type HandPositionEvent = {
+        timestamp: number;
+        type: "hand_position";
+        left_hand?: HandPosition["left_hand"];
+        right_hand?: HandPosition["right_hand"];
+        grid_cell?: GridActivity["active_cells"][number];
+        in_confirmation_area?: boolean;
 };
 
 export class MqttService {
