@@ -33,7 +33,9 @@ const mockManagementInterface = {
   systemStatus: 'Operational' as const,
   isConnected: true,
   mqttService: {} as any,
-  reconnect: vi.fn()
+  reconnect: vi.fn(),
+  brokerUrl: 'ws://localhost:8083',
+  updateBrokerUrl: vi.fn()
 }
 
 vi.mock('../../context/ManagementInterfaceContext', () => ({

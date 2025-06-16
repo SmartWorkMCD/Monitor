@@ -165,16 +165,6 @@ const AlertsModal = ({ warnings, isOpen, onClose }: AlertsModalProps) => {
 					</div>
 					<div className="flex space-x-2">
 						<button
-							onClick={() => {
-								// Export functionality could be added here
-								console.log('Export alerts', filteredWarnings);
-							}}
-							className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
-							type="button"
-						>
-							Export
-						</button>
-						<button
 							onClick={onClose}
 							className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
 							type="button"

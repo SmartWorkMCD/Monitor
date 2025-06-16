@@ -39,6 +39,8 @@ interface ManagementContextType extends DataState {
   exportWarnings: () => void;
   retryConnection: () => void;
   getConnectionHealth: () => 'healthy' | 'warning' | 'critical';
+  brokerUrl: string;
+  updateBrokerUrl: (url: string) => void;
 }
 
 const defaultSensorData: SensorData = {
@@ -114,6 +116,7 @@ export const useManagementInterface = () => {
 
 export const ManagementInterfaceProvider = ({ children }: { children: ReactNode }) => {
   const [mqttService] = useState(() => new MqttService(mqttConfig));
+  const [brokerUrl, setBrokerUrl] = useState(mqttConfig.brokerUrl);
   const [dataState, setDataState] = useState<DataState>({
     sensorData: defaultSensorData,
     tasks: [],
@@ -312,6 +315,7 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
   const connectToMqtt = useCallback(async () => {
     try {
       console.log('Connecting to MQTT broker for Workstation Brain data...');
+      mqttService.setBrokerUrl(brokerUrl);
 
       await mqttService.connect({
         onSensorData: updateSensorData,
@@ -359,7 +363,8 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
     updateHandPosition,
     updateGridActivity,
     updateTaskProgress,
-    updateNeighborsData
+    updateNeighborsData,
+    brokerUrl
   ]);
 
   const reconnect = useCallback(async () => {
@@ -373,6 +378,12 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
       console.error('Retry connection failed:', error);
     });
   }, [reconnect]);
+
+    const updateBrokerUrl = useCallback((url: string) => {
+    setBrokerUrl(url);
+    mqttService.setBrokerUrl(url);
+    reconnect().catch((err) => console.error('Broker reconnection failed:', err));
+  }, [mqttService, reconnect]);
 
   // Connection health monitoring
   useEffect(() => {
@@ -413,7 +424,9 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
     acknowledgeWarning,
     exportWarnings,
     retryConnection,
-    getConnectionHealth
+    getConnectionHealth,
+    brokerUrl,
+    updateBrokerUrl
   };
 
   return (

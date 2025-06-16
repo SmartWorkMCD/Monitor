@@ -151,19 +151,28 @@ export class MqttService {
 		completed_tasks: [],
 		task_queue: [],
 	};
+
 	private currentNeighborsData: NeighborsData = {
-		stations: [],
-		topology: {
-			positions: {},
-			connections: [],
-			graph: { nodes: [], edges: [] },
-		},
-		ble_connections: [],
-		last_update: 0,
+			stations: [],
+			topology: {
+					positions: {},
+					connections: [],
+					graph: { nodes: [], edges: [] },
+			},
+			ble_connections: [],
+			last_update: 0,
 	};
 
 	constructor(config: MqttConfig) {
-		this.config = config;
+			this.config = config;
+	}
+
+	setBrokerUrl(url: string) {
+			this.config.brokerUrl = url;
+	}
+
+	getBrokerUrl() {
+			return this.config.brokerUrl;
 	}
 
 	async connect(callbacks: DataUpdateCallback): Promise<void> {
@@ -697,7 +706,6 @@ export class MqttService {
 			case "performance_metrics":
 				this.updatePerformanceMetrics(message);
 				break;
-				break;
 			case "hand_position":
 				this.handleHandTrackingMessage(
 					(message as any).hand_position ?? message,
@@ -957,8 +965,8 @@ export class MqttService {
 				Math.min(70, this.currentSensorData.humidity),
 			);
 
-			this.currentSensorData.temperatureChange = (Math.random() - 0.5) * 2;
-			this.currentSensorData.humidityChange = (Math.random() - 0.5) * 3;
+			this.currentSensorData.temperatureChange = Math.floor((Math.random() - 0.5) * 2 * 4) / 4;
+			this.currentSensorData.humidityChange = Math.floor((Math.random() - 0.5) * 3 * 4) / 4;
 
 			this.callbacks.onSensorData?.(this.currentSensorData);
 

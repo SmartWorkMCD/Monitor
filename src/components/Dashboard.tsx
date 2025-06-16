@@ -17,7 +17,7 @@ const Dashboard = () => {
     handPosition,
     gridActivity,
     realTimeMetrics,
-   neighborsData = {
+    neighborsData = {
       stations: [],
       topology: { positions: {}, connections: [], graph: { nodes: [], edges: [] } },
       ble_connections: [],
@@ -30,10 +30,14 @@ const Dashboard = () => {
       topics_subscribed: [],
       message_count: 0,
       error_count: 0
-    }
+    },
+    brokerUrl,
+    updateBrokerUrl
   } = useManagementInterface();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'realtime' | 'network' | 'analytics'>('overview');
+  const [serverUrlInput, setServerUrlInput] = useState(brokerUrl);
+
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -113,11 +117,10 @@ const Dashboard = () => {
                     {neighborsData.stations.map((station) => (
                       <div key={station.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full ${
-                            station.status === 'online' ? 'bg-green-400' :
-                            station.status === 'offline' ? 'bg-red-400' :
-                            station.status === 'updating' ? 'bg-yellow-400' : 'bg-gray-400'
-                          }`} />
+                          <div className={`w-3 h-3 rounded-full ${station.status === 'online' ? 'bg-green-400' :
+                              station.status === 'offline' ? 'bg-red-400' :
+                                station.status === 'updating' ? 'bg-yellow-400' : 'bg-gray-400'
+                            }`} />
                           <span className="font-medium">{station.id}</span>
                           {station.is_master && <span className="text-yellow-600">👑</span>}
                         </div>
@@ -179,9 +182,8 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <div className="font-medium text-gray-600">Errors</div>
-                    <div className={`text-lg font-bold ${
-                      connectionStatus.error_count > 0 ? 'text-red-600' : 'text-green-600'
-                    }`}>
+                    <div className={`text-lg font-bold ${connectionStatus.error_count > 0 ? 'text-red-600' : 'text-green-600'
+                      }`}>
                       {connectionStatus.error_count}
                     </div>
                   </div>
@@ -236,10 +238,9 @@ const Dashboard = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${
-                        realTimeMetrics.network_latency < 50 ? 'bg-green-500' :
-                        realTimeMetrics.network_latency < 100 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
+                      className={`h-2 rounded-full ${realTimeMetrics.network_latency < 50 ? 'bg-green-500' :
+                          realTimeMetrics.network_latency < 100 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
                       style={{ width: `${Math.min(100, realTimeMetrics.network_latency)}%` }}
                     />
                   </div>
@@ -252,10 +253,9 @@ const Dashboard = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${
-                        realTimeMetrics.error_rate < 1 ? 'bg-green-500' :
-                        realTimeMetrics.error_rate < 5 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
+                      className={`h-2 rounded-full ${realTimeMetrics.error_rate < 1 ? 'bg-green-500' :
+                          realTimeMetrics.error_rate < 5 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
                       style={{ width: `${Math.min(100, realTimeMetrics.error_rate * 10)}%` }}
                     />
                   </div>
@@ -271,10 +271,9 @@ const Dashboard = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Overall Status</span>
-                    <span className={`font-bold ${
-                      sensorData.status === 'Operational' ? 'text-green-600' :
-                      sensorData.status === 'Warning' ? 'text-yellow-600' : 'text-red-600'
-                    }`}>
+                    <span className={`font-bold ${sensorData.status === 'Operational' ? 'text-green-600' :
+                        sensorData.status === 'Warning' ? 'text-yellow-600' : 'text-red-600'
+                      }`}>
                       {sensorData.status}
                     </span>
                   </div>
@@ -344,6 +343,23 @@ const Dashboard = () => {
           </div>
         </div>
 
+        <div className="flex items-center justify-end mb-2 space-x-2">
+          <label className="text-xs text-gray-600" htmlFor="broker-url">Data server:</label>
+          <input
+            id="broker-url"
+            className="border rounded px-2 py-1 text-xs w-48"
+            value={serverUrlInput}
+            onChange={(e) => setServerUrlInput(e.target.value)}
+          />
+          <button
+            onClick={() => updateBrokerUrl(serverUrlInput)}
+            className="px-2 py-1 text-xs bg-blue-600 text-white rounded"
+            type="button"
+          >
+            Apply
+          </button>
+        </div>
+
         {/* Tab Navigation */}
         <div className="flex space-x-1 bg-gray-200 p-1 rounded-lg">
           {[
@@ -355,11 +371,10 @@ const Dashboard = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab.id
+              className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-800'
-              }`}
+                }`}
             >
               <tab.icon size={16} className="mr-2" />
               {tab.label}
