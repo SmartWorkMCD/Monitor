@@ -337,7 +337,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Monitor size={24} className="text-blue-600 mr-2" />
-            <h1 className="text-2xl font-semibold text-gray-800">Workstation Brain Monitor</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Workstation Monitor</h1>
           </div>
           <div className="text-sm text-gray-600">
             Real-time data from Smart Work MCD

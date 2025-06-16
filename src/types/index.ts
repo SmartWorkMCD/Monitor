@@ -278,13 +278,23 @@ export type PerformanceMetricsEvent = {
     metrics: Record<string, any>;
 };
 
+export type HandPositionEvent = {
+    timestamp: number;
+    type: "hand_position";
+    left_hand?: HandCoordinates;
+    right_hand?: HandCoordinates;
+    grid_cell?: GridCell;
+    in_confirmation_area?: boolean;
+};
+
 export type ManagementEvent =
     | SystemStatusEvent
     | StateTransitionEvent
     | TaskUpdateEvent
     | RuleEvaluationEvent
-	| UserActionEvent
-	| PerformanceMetricsEvent;
+    | UserActionEvent
+    | PerformanceMetricsEvent
+    | HandPositionEvent;
 
 // Workstation states from the Brain
 export type WorkstationState =

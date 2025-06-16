@@ -4,8 +4,6 @@ import {
 	ArrowDown,
 	Thermometer,
 	Droplets,
-	Zap,
-	Gauge,
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import dayjs from "dayjs";
