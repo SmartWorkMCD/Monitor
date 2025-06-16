@@ -191,7 +191,7 @@ export class MqttService {
 						payload: JSON.stringify({
 							timestamp: Date.now() / 1000,
 							type: "client_disconnect",
-							client_id: `monitor_dashboard`,
+							client_id: "monitor_dashboard",
 						}),
 						qos: 1,
 						retain: false,

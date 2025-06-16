@@ -37,6 +37,7 @@ const Dashboard = () => {
 
   const [activeTab, setActiveTab] = useState<'overview' | 'realtime' | 'network' | 'analytics'>('overview');
   const [serverUrlInput, setServerUrlInput] = useState(brokerUrl);
+  const [isEditingUrl, setIsEditingUrl] = useState(false);
 
 
   const renderTabContent = () => {
@@ -336,28 +337,33 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Monitor size={24} className="text-blue-600 mr-2" />
-            <h1 className="text-2xl font-semibold text-gray-800">Workstation Monitor</h1>
+            <div>
+            <h1 className="text-xl font-semibold text-gray-800">Workstation Monitor</h1>
+            <div className="flex items-center justify-end space-x-2">
+              <label className="text-xs text-gray-600" htmlFor="broker-url">server:</label>
+              {isEditingUrl ? <>
+              <input
+                id="broker-url"
+                className="border rounded px-2 py-1 text-xs w-48 text-gray-800"
+                value={serverUrlInput}
+                onChange={(e) => setServerUrlInput(e.target.value)}
+              />
+              <button
+                onClick={() => {updateBrokerUrl(serverUrlInput);setIsEditingUrl(false)}}
+                className="px-2 py-1 text-xs bg-blue-600 text-white rounded cursor-pointer"
+                type="button"
+              >
+                Apply
+              </button>
+              </> : <>
+              <span className="text-xs font-mono text-blue-600 cursor-pointer" role="button" onClick={()=>setIsEditingUrl(true)}>{brokerUrl}</span>
+              </>}
+            </div>
+            </div>
           </div>
           <div className="text-sm text-gray-600">
             Real-time data from Smart Work MCD
           </div>
-        </div>
-
-        <div className="flex items-center justify-end mb-2 space-x-2">
-          <label className="text-xs text-gray-600" htmlFor="broker-url">Data server:</label>
-          <input
-            id="broker-url"
-            className="border rounded px-2 py-1 text-xs w-48"
-            value={serverUrlInput}
-            onChange={(e) => setServerUrlInput(e.target.value)}
-          />
-          <button
-            onClick={() => updateBrokerUrl(serverUrlInput)}
-            className="px-2 py-1 text-xs bg-blue-600 text-white rounded"
-            type="button"
-          >
-            Apply
-          </button>
         </div>
 
         {/* Tab Navigation */}
