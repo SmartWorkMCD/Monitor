@@ -46,9 +46,6 @@ const defaultSensorData: SensorData = {
   temperatureChange: 0,
   humidity: 50,
   humidityChange: 0,
-  pressure: 760,
-  powerUsage: 4.0,
-  powerUsageChange: 0,
   status: 'Operational',
   maintenanceDate: Date.now() + 86400000 * 7
 };

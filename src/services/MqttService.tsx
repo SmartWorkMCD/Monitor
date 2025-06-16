@@ -10,7 +10,7 @@ import type {
   HandPosition,
   GridActivity,
   TaskProgress,
-  NeighborsData
+  NeighborsData,
 } from '../types';
 
 export interface MqttConfig {
@@ -124,9 +124,6 @@ export class MqttService {
     temperatureChange: 0,
     humidity: 50,
     humidityChange: 0,
-    pressure: 760,
-    powerUsage: 4.0,
-    powerUsageChange: 0,
     status: 'Operational',
     maintenanceDate: Date.now() + 86400000 * 7
   };
@@ -289,6 +286,8 @@ export class MqttService {
       this.config.topics.candy,
       this.config.topics.hand,
       this.config.topics.task_assignment,
+      this.config.topics.task_publish,
+      this.config.topics.task_subscribe,
       this.config.topics.neighbors_update,
       this.config.topics.station_neighbors,
       this.config.topics.topology_positions
@@ -333,6 +332,12 @@ export class MqttService {
           break;
         case topic === this.config.topics.task_assignment:
           this.handleTaskAssignmentMessage(message);
+          break;
+        case topic === this.config.topics.task_publish:
+          this.handleTaskAssignmentMessage(message);
+          break;
+        case topic === this.config.topics.task_subscribe:
+          this.handleTaskCompletionMessage(message);
           break;
         case topic === this.config.topics.neighbors_update:
           this.handleNeighborsUpdateMessage(message);
@@ -385,6 +390,46 @@ export class MqttService {
 
         this.currentCandyDetection = candyDetection;
         this.callbacks.onCandyDetection?.(candyDetection);
+      } else {
+        const indices = Array.from(
+          new Set(
+            Object.keys(message)
+              .map(k => /^yolo_(\d+)_/.exec(k))
+              .filter(Boolean)
+              .map(m => parseInt(m![1], 10))
+          )
+        );
+
+        if (indices.length > 0) {
+          const detections = indices.map(i => ({
+            class: message[`yolo_${i}_class`],
+            x1: message[`yolo_${i}_x1`],
+            y1: message[`yolo_${i}_y1`],
+            x2: message[`yolo_${i}_x2`],
+            y2: message[`yolo_${i}_y2`],
+            score: message[`yolo_${i}_score`],
+            center_x: (message[`yolo_${i}_x1`] + message[`yolo_${i}_x2`]) / 2,
+            center_y: (message[`yolo_${i}_y1`] + message[`yolo_${i}_y2`]) / 2,
+            width: Math.abs(message[`yolo_${i}_x2`] - message[`yolo_${i}_x1`]),
+            height: Math.abs(message[`yolo_${i}_y2`] - message[`yolo_${i}_y1`])
+          }));
+
+          const colors: Record<string, number> = {};
+          detections.forEach(d => {
+            colors[d.class] = (colors[d.class] || 0) + 1;
+          });
+
+          const candyDetection: CandyDetection = {
+            detections,
+            timestamp: Date.now(),
+            total_candies: detections.length,
+            colors_detected: colors,
+            in_validation_area: false
+          };
+
+          this.currentCandyDetection = candyDetection;
+          this.callbacks.onCandyDetection?.(candyDetection);
+        }
       }
     } catch (error) {
       console.error('Error processing candy detection message:', error);
@@ -397,7 +442,10 @@ export class MqttService {
       if (message.left_hand || message.right_hand) {
         const handPosition: HandPosition = {
           left_hand: message.left_hand,
-          right_hand: message.right_hand,
+          right_hand: message.right_hand ||
+            (message.handR_Wrist_x !== undefined
+              ? { x: message.handR_Wrist_x, y: message.handR_Wrist_y }
+              : undefined),
           timestamp: message.timestamp || Date.now(),
           grid_cell: message.grid_cell,
           in_confirmation_area: message.in_confirmation_area || false
@@ -449,12 +497,58 @@ export class MqttService {
             });
           }
         });
+      } else {
+        Object.entries(message).forEach(([productId, tasks]) => {
+          if (Array.isArray(tasks)) {
+            tasks.forEach(task => {
+              this.updateTaskFromAssignment(productId, task as string, undefined);
+            });
+          }
+        });
       }
     } catch (error) {
       console.error('Error processing task assignment message:', error);
       this.errorCount++;
     }
   }
+
+  private handleTaskCompletionMessage(message: any): void {
+    try {
+      const productId = message.produto_id || message.product_id;
+      Object.entries(message).forEach(([key, value]) => {
+        if (key === 'produto_id' || key === 'product_id') return;
+        const duration = typeof value === 'number' ? value : parseFloat(value as string);
+        const completion = {
+          task_id: key,
+          subtask_id: key,
+          duration,
+          timestamp: Date.now(),
+          product_id: productId,
+          success: true
+        };
+
+        this.currentTaskProgress.completed_tasks.unshift(completion);
+
+        const existingTask = this.currentTasks.get(key);
+        if (existingTask) {
+          existingTask.status = 'completed';
+          existingTask.duration = duration;
+          this.currentTasks.set(key, existingTask);
+        }
+      });
+
+      if (this.currentTaskProgress.completed_tasks.length > 50) {
+        this.currentTaskProgress.completed_tasks = this.currentTaskProgress.completed_tasks.slice(0, 50);
+      }
+
+      this.callbacks.onTasks?.(Array.from(this.currentTasks.values()));
+      this.callbacks.onTaskProgress?.(this.currentTaskProgress);
+    } catch (error) {
+      console.error('Error processing task completion message:', error);
+      this.errorCount++;
+    }
+  }
+
 
   private updateTaskFromAssignment(taskId: string, subtaskId: string, products: any): void {
     const task: Task = {
@@ -687,15 +781,6 @@ export class MqttService {
 
   private updateSystemState(event: StateTransitionEvent): void {
     console.log(`State transition: ${event.from_state} → ${event.to_state}`);
-
-    if (event.to_state === 'executing_task') {
-      this.currentSensorData.powerUsage += 0.5;
-      this.currentSensorData.powerUsageChange = 0.5;
-    } else if (event.to_state === 'cleaning') {
-      this.currentSensorData.powerUsage -= 0.3;
-      this.currentSensorData.powerUsageChange = -0.3;
-    }
-
     this.callbacks.onSensorData?.(this.currentSensorData);
   }
 
@@ -789,15 +874,14 @@ export class MqttService {
       }
 
       // Simulate sensor changes
-      this.currentSensorData.temperature += (Math.random() - 0.5) * 2;
-      this.currentSensorData.humidity += (Math.random() - 0.5) * 3;
+      this.currentSensorData.temperature += Math.floor((Math.random() - 0.5) * 2 * 4) / 4;
+      this.currentSensorData.humidity += Math.floor((Math.random() - 0.5) * 3 * 4) / 4;
 
       this.currentSensorData.temperature = Math.max(20, Math.min(35, this.currentSensorData.temperature));
       this.currentSensorData.humidity = Math.max(30, Math.min(70, this.currentSensorData.humidity));
 
       this.currentSensorData.temperatureChange = (Math.random() - 0.5) * 2;
       this.currentSensorData.humidityChange = (Math.random() - 0.5) * 3;
-      this.currentSensorData.powerUsageChange = (Math.random() - 0.5) * 0.5;
 
       this.callbacks.onSensorData?.(this.currentSensorData);
 

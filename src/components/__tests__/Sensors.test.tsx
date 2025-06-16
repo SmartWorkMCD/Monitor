@@ -96,40 +96,11 @@ describe('Sensors', () => {
     expect(screen.getByTestId('humidity-change')).toHaveTextContent('2.5% from last hour')
   })
 
-  it('displays pressure metric correctly', () => {
-    const mockData = createMockSensorData({ pressure: 760 })
-    render(<Sensors sensorData={mockData} />)
-
-    const pressureMetric = screen.getByTestId('pressure-metric')
-    expect(pressureMetric).toBeInTheDocument()
-
-    expect(screen.getByText('Pressure')).toBeInTheDocument()
-    expect(screen.getByTestId('pressure-value')).toHaveTextContent('760')
-    expect(screen.getByText('mmHg')).toBeInTheDocument()
-    expect(screen.getByTestId('pressure-change')).toHaveTextContent('Stable')
-  })
-
-  it('displays power usage metric correctly', () => {
-    const mockData = createMockSensorData({
-      powerUsage: 4.2,
-      powerUsageChange: 0.1
-    })
-    render(<Sensors sensorData={mockData} />)
-
-    const powerMetric = screen.getByTestId('power-metric')
-    expect(powerMetric).toBeInTheDocument()
-
-    expect(screen.getByText('Power')).toBeInTheDocument()
-    expect(screen.getByTestId('power-value')).toHaveTextContent('4.2')
-    expect(screen.getByText('kW')).toBeInTheDocument()
-    expect(screen.getByTestId('power-change')).toHaveTextContent('0.1kW from yesterday')
-  })
 
   it('shows correct change indicators for positive changes', () => {
     const mockData = createMockSensorData({
       temperatureChange: 2.5,
-      humidityChange: 1.2,
-      powerUsageChange: 0.3
+      humidityChange: 1.2
     })
 
     render(<Sensors sensorData={mockData} />)
@@ -137,14 +108,12 @@ describe('Sensors', () => {
     // Test specific change indicators using test IDs
     expect(screen.getByTestId('temperature-change')).toHaveClass('text-red-600')
     expect(screen.getByTestId('humidity-change')).toHaveClass('text-red-600')
-    expect(screen.getByTestId('power-change')).toHaveClass('text-red-600')
   })
 
   it('shows correct change indicators for negative changes', () => {
     const mockData = createMockSensorData({
       temperatureChange: -1.5,
-      humidityChange: -0.8,
-      powerUsageChange: -0.2
+      humidityChange: -0.8
     })
 
     render(<Sensors sensorData={mockData} />)
@@ -152,7 +121,6 @@ describe('Sensors', () => {
     // Test specific change indicators using test IDs
     expect(screen.getByTestId('temperature-change')).toHaveClass('text-green-600')
     expect(screen.getByTestId('humidity-change')).toHaveClass('text-green-600')
-    expect(screen.getByTestId('power-change')).toHaveClass('text-green-600')
   })
 
   it('displays system notes with maintenance information', () => {
@@ -172,15 +140,13 @@ describe('Sensors', () => {
     // Check for specific metric card styling using test IDs
     expect(screen.getByTestId('temperature-metric')).toHaveClass('bg-blue-50', 'p-3', 'rounded-lg')
     expect(screen.getByTestId('humidity-metric')).toHaveClass('bg-teal-50', 'p-3', 'rounded-lg')
-    expect(screen.getByTestId('pressure-metric')).toHaveClass('bg-purple-50', 'p-3', 'rounded-lg')
-    expect(screen.getByTestId('power-metric')).toHaveClass('bg-amber-50', 'p-3', 'rounded-lg')
+
   })
 
   it('handles zero change values correctly', () => {
     const mockData = createMockSensorData({
       temperatureChange: 0,
       humidityChange: 0,
-      powerUsageChange: 0
     })
 
     render(<Sensors sensorData={mockData} />)
@@ -188,7 +154,6 @@ describe('Sensors', () => {
     // Should show stable indicators for zero changes
     expect(screen.getByTestId('temperature-change')).toHaveClass('text-gray-600')
     expect(screen.getByTestId('humidity-change')).toHaveClass('text-gray-600')
-    expect(screen.getByTestId('power-change')).toHaveClass('text-gray-600')
   })
 
   it('displays icons for each metric', () => {
@@ -198,13 +163,10 @@ describe('Sensors', () => {
     // Check that each metric container has an icon (SVG)
     const temperatureMetric = screen.getByTestId('temperature-metric')
     const humidityMetric = screen.getByTestId('humidity-metric')
-    const pressureMetric = screen.getByTestId('pressure-metric')
-    const powerMetric = screen.getByTestId('power-metric')
 
     expect(temperatureMetric.querySelector('svg')).toBeInTheDocument()
     expect(humidityMetric.querySelector('svg')).toBeInTheDocument()
-    expect(pressureMetric.querySelector('svg')).toBeInTheDocument()
-    expect(powerMetric.querySelector('svg')).toBeInTheDocument()
+
   })
 
   it('sets up and cleans up timer correctly', () => {
@@ -239,8 +201,6 @@ describe('Sensors', () => {
     // Check that all metrics are visible and accessible
     expect(screen.getByTestId('temperature-metric')).toBeVisible()
     expect(screen.getByTestId('humidity-metric')).toBeVisible()
-    expect(screen.getByTestId('pressure-metric')).toBeVisible()
-    expect(screen.getByTestId('power-metric')).toBeVisible()
     expect(screen.getByTestId('system-notes')).toBeVisible()
   })
 

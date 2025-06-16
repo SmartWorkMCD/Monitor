@@ -286,7 +286,10 @@ const Warnings = ({ warnings }: WarningsProps) => {
 					<button
 						className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
 						data-testid="view-all-alerts-button"
-						onClick={() => setIsModalOpen(true)}
+						onClick={() => {
+								console.warn('View all alerts clicked');
+								setIsModalOpen(true);
+						}}
 						type="button"
 					>
 						View All Alerts ({warnings.length})

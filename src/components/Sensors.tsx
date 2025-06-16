@@ -52,7 +52,6 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 
 	const temperatureChange = getChangeIndicator(sensorData.temperatureChange);
 	const humidityChange = getChangeIndicator(sensorData.humidityChange);
-	const powerChange = getChangeIndicator(sensorData.powerUsageChange);
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-full overflow-y-auto">
@@ -116,45 +115,7 @@ const Sensors = ({ sensorData }: SensorsProps) => {
 					</div>
 				</div>
 
-				{/* Pressure metric */}
-				<div className="bg-purple-50 p-3 rounded-lg" data-testid="pressure-metric">
-					<div className="flex items-center mb-2">
-						<Gauge size={18} className="text-purple-600 mr-2" />
-						<span className="text-sm font-medium text-gray-700">Pressure</span>
-					</div>
-					<div className="flex items-baseline">
-						<span className="text-2xl font-bold text-purple-700" data-testid="pressure-value">
-							{sensorData.pressure}
-						</span>
-						<span className="ml-1 text-gray-500">mmHg</span>
-					</div>
-					<div className="flex items-center mt-1 text-xs text-gray-600" data-testid="pressure-change">
-						<span>Stable</span>
-					</div>
-				</div>
 
-				{/* Power usage metric */}
-				<div className="bg-amber-50 p-3 rounded-lg" data-testid="power-metric">
-					<div className="flex items-center mb-2">
-						<Zap size={18} className="text-amber-600 mr-2" />
-						<span className="text-sm font-medium text-gray-700">Power</span>
-					</div>
-					<div className="flex items-baseline">
-						<span className="text-2xl font-bold text-amber-700" data-testid="power-value">
-							{sensorData.powerUsage}
-						</span>
-						<span className="ml-1 text-gray-500">kW</span>
-					</div>
-					<div
-						className={`flex items-center mt-1 text-xs ${powerChange.className}`}
-						data-testid="power-change"
-					>
-						{powerChange.icon}
-						<span>
-							{Math.abs(sensorData.powerUsageChange)}kW from yesterday
-						</span>
-					</div>
-				</div>
 			</div>
 
 			{/* System notes section */}

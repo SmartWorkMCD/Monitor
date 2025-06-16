@@ -11,9 +11,6 @@ const mockManagementInterface = {
     temperatureChange: -1.2,
     humidity: 45,
     humidityChange: 2.5,
-    pressure: 760,
-    powerUsage: 4.2,
-    powerUsageChange: 0.1,
     status: 'Operational',
     maintenanceDate: 1757401797000
   } as SensorData,

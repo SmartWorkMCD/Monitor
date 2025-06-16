@@ -73,9 +73,6 @@ export const createMockSensorData = (overrides: Partial<SensorData> = {}): Senso
   temperatureChange: -1.2,
   humidity: 45,
   humidityChange: 2.5,
-  pressure: 760,
-  powerUsage: 4.2,
-  powerUsageChange: 0.1,
   status: 'Operational',
   maintenanceDate: Date.now() + 86400000 * 7, // 7 days from now
   ...overrides,

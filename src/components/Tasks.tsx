@@ -118,7 +118,7 @@ const Tasks = ({ tasks }: TasksProps) => {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-4" data-testid="tasks-header">
 				<h2 className="text-lg font-bold text-gray-700" data-testid="tasks-title">
-					Task Management
+					Task List
 				</h2>
 				<div className="text-sm text-gray-500">
 					{stats.inProgress > 0 && (
@@ -266,7 +266,7 @@ const Tasks = ({ tasks }: TasksProps) => {
 						className="text-gray-500"
 						data-testid="tasks-status-breakdown"
 					>
-						{stats.pending} pending{stats.waiting > 0 && ` • ${stats.waiting} waiting`}{stats.failed > 0 && ` • ${stats.failed} failed`}
+						{stats.completed} completed • {stats.inProgress} in progress • {stats.pending} pending
 					</span>
 				</div>
 

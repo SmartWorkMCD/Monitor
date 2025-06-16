@@ -28,9 +28,6 @@ export interface SensorData {
 	temperatureChange: number;
 	humidity: number;
 	humidityChange: number;
-	pressure: number;
-	powerUsage: number;
-	powerUsageChange: number;
 	status: SystemStatus;
 	maintenanceDate: number;
 	// Real-time data from workstation
@@ -256,6 +253,8 @@ export type TaskUpdateEvent = {
     subtask_id: string;
     status: string;
     progress: number;
+	product_id?: string;
+    duration?: number;
 };
 
 export type RuleEvaluationEvent = {

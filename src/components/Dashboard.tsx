@@ -17,8 +17,20 @@ const Dashboard = () => {
     handPosition,
     gridActivity,
     realTimeMetrics,
-    neighborsData,
-    connectionStatus
+   neighborsData = {
+      stations: [],
+      topology: { positions: {}, connections: [], graph: { nodes: [], edges: [] } },
+      ble_connections: [],
+      master_station: undefined,
+      last_update: 0
+    },
+    connectionStatus = {
+      mqtt_connected: false,
+      last_data_received: 0,
+      topics_subscribed: [],
+      message_count: 0,
+      error_count: 0
+    }
   } = useManagementInterface();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'realtime' | 'network' | 'analytics'>('overview');
@@ -27,7 +39,7 @@ const Dashboard = () => {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-1 lg:grid-rows-3 gap-4 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-1 lg:grid-rows-3 gap-4 h-full" data-testid="dashboard-grid">
             <div className="lg:col-span-2 lg:row-span-3" data-testid="tasks-section">
               <Tasks tasks={tasks} />
             </div>
@@ -325,7 +337,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Monitor size={24} className="text-blue-600 mr-2" />
-            <h1 className="text-2xl font-bold text-gray-800">Workstation Brain Monitor</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Workstation Brain Monitor</h1>
           </div>
           <div className="text-sm text-gray-600">
             Real-time data from Smart Work MCD
