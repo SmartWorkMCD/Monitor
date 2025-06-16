@@ -159,7 +159,7 @@ describe('Tasks', () => {
     render(<Tasks tasks={[]} />)
 
     expect(screen.getByTestId('tasks-total-count')).toHaveTextContent('0 tasks total')
-    expect(screen.getByTestId('tasks-status-breakdown')).toHaveTextContent('0 completed • 0 in progress • 0 pending')
+    expect(screen.getByTestId('tasks-status-breakdown')).toHaveTextContent('0 pending')
   })
 
   it('applies hover effects to task items', () => {

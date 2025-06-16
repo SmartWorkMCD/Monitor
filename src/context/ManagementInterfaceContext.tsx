@@ -132,6 +132,7 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
     connectionStatus: defaultConnectionStatus,
     lastUpdate: 0
   });
+  console.log('dataState:', dataState);
 
   // Enhanced update functions with better state management
   const updateSensorData = useCallback((sensorData: SensorData) => {
@@ -331,12 +332,6 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
       console.log('Successfully connected to Workstation Brain MQTT broker');
 
       // Start simulation only if no real data is received
-      setTimeout(() => {
-        if (dataState.tasks.length === 0 && dataState.lastUpdate < Date.now() - 30000) {
-          console.log('No real data received, starting simulation...');
-          mqttService.simulateSensorUpdates();
-        }
-      }, 30000);
 
     } catch (error) {
       console.error('Failed to connect to MQTT:', error);
@@ -367,9 +362,7 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
     updateHandPosition,
     updateGridActivity,
     updateTaskProgress,
-    updateNeighborsData,
-    dataState.tasks.length,
-    dataState.lastUpdate
+    updateNeighborsData
   ]);
 
   const reconnect = useCallback(async () => {
@@ -396,6 +389,16 @@ export const ManagementInterfaceProvider = ({ children }: { children: ReactNode 
 
     return () => clearInterval(healthCheck);
   }, [getConnectionHealth, dataState.isConnected, retryConnection]);
+
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      if (dataState.tasks.length === 0 && dataState.lastUpdate < Date.now() - 30000) {
+        console.log('No real data received, starting simulation...');
+        mqttService.simulateSensorUpdates();
+      }
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [mqttService, dataState.tasks.length, dataState.lastUpdate]);
 
   // Initialize connection
   useEffect(() => {

@@ -167,7 +167,7 @@ describe('Warnings', () => {
 
     const button = screen.getByTestId('view-all-alerts-button')
     expect(button).toBeInTheDocument()
-    expect(button).toHaveTextContent('View All Alerts')
+    expect(button).toHaveTextContent(/View All Alerts/)
     expect(button).toHaveClass(
       'w-full',
       'py-2',

@@ -248,8 +248,10 @@ describe('Dashboard', () => {
     expect(screen.getByTestId('connection-status-component')).toHaveTextContent('Connected')
   })
 
-  it('maintains responsive design classes', () => {
-    render(<Dashboard />)
+  it('maintains responsive design classes', async () => {
+    const { user } = render(<Dashboard />)
+
+    await user.click(screen.getByRole('button', { name: /Network/i }))
 
     const grid = screen.getByTestId('dashboard-grid')
 
