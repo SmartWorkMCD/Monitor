@@ -72,11 +72,13 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
-      - name: Clean pnpm cache
-        run: pnpm store prune
-
+      - name: Remove corrupted lockfile and reinstall
+        run: |
+          rm -rf pnpm-lock.yaml node_modules
+          pnpm install
+    
       - name: Install dependencies
-        run: pnpm install --force
+        run: pnpm install
 
       - name: Build project
         run: pnpm build
