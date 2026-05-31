@@ -51,5 +51,8 @@ export default defineConfig({
       junit: './junit.xml',
     },
     isolate: true,
+    alias: {
+      mqtt: new URL('./src/test/mocks/mqtt.ts', import.meta.url).pathname,
+    },
   },
 })
