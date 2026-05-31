@@ -72,8 +72,11 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
+      - name: Clean pnpm cache
+        run: pnpm store prune
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --force
 
       - name: Build project
         run: pnpm build
